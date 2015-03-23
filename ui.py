@@ -98,7 +98,7 @@ def heatmap(axes=None):
         iw_list, voltage_area)
     heatmap_ = heatmap_axes.imshow(current_function, extent=extent,
                                    interpolation="nearest", aspect="auto",
-                                   cmap=cm.binary)
+                                   cmap=cm.rainbow)
     plot.colorbar(heatmap_, cax=colorbar_axes)
 
     heatmap_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])

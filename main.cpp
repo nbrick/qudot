@@ -16,24 +16,24 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 /* USER CONFIGURATION */
 
 constexpr double single_electron_energies[] = {
-    -0.1*e, +0.1*e, -0.05*e, -0.05*e, -0.05*e, -0.05*e,
+    -0.1*e, +0.1*e, -0.05*e, -0.05*e, -0.05*e, -0.05*e, 0.0*e, 0.0*e
     // 0.1*e, 0.1*e, 0.1*e, 0.1*e, //0.2*e, 0.2*e, 0.3*e, 0.3*e
 };  // Joules
 
 constexpr double gate_capacitance =   1e-19;  // Farads
 constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  1e-18;  // Farads
+constexpr double drain_capacitance =  3e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 constexpr double source_width = 1;  // arb.
 constexpr double drain_width =  1;  // arb.
 
-constexpr double v_g_min = -5;       // Volts
+constexpr double v_g_min = -3;       // Volts
 constexpr double v_g_max =  5;      // Volts
-constexpr int v_g_steps = 400;      // (y-axis resolution)
+constexpr int v_g_steps = 200;      // (y-axis resolution)
 
 constexpr double v_sd_min = -0.1;   // Volts
-constexpr double v_sd_max =  0.4;     // Volts
+constexpr double v_sd_max =  0.3;     // Volts
 constexpr int v_sd_steps = 200;     // (x-axis resolution)
 
 
@@ -57,7 +57,7 @@ constexpr double drain_dos (double energy) {
 constexpr double s_fermi_energy = 0.0*e;  // Joules
 
 
-constexpr double evolution_step_size = 1e-2;
+constexpr double evolution_step_size = 5e-2;
 constexpr double convergence_criterion = 1e-10;
 
 
@@ -255,6 +255,15 @@ int main () {
     for (int voltage_index = 0;
          voltage_index < v_g_steps*v_sd_steps;
          ++voltage_index) {
+
+        /* Normalise weights guess to prevent drift */
+        double sum_weights = 0;
+        for (cfg config = 0; config < n_configs; ++config) {
+            sum_weights += guess[config];
+        }
+        for (cfg config = 0; config < n_configs; ++config) {
+            guess[config] /= sum_weights;
+        }
 
         auto voltage = voltage_pair_from_index(voltage_index);
         outfile << voltage.gate << " ; " << voltage.sd;

@@ -16,7 +16,8 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 /* USER CONFIGURATION */
 
 constexpr double single_electron_energies[] = {
-    -0.1*e, -0.1*e, 0.1*e, 0.1*e, 0.2*e, 0.2*e, 0.3*e, 0.3*e
+    -0.1*e, +0.1*e, -0.05*e, -0.05*e, -0.05*e, -0.05*e,
+    // 0.1*e, 0.1*e, 0.1*e, 0.1*e, //0.2*e, 0.2*e, 0.3*e, 0.3*e
 };  // Joules
 
 constexpr double gate_capacitance =   1e-19;  // Farads
@@ -27,13 +28,13 @@ constexpr double extra_capacitance =  1e-19;  // Farads
 constexpr double source_width = 1;  // arb.
 constexpr double drain_width =  1;  // arb.
 
-constexpr double v_g_min = 0;       // Volts
-constexpr double v_g_max = 0.1;     // Volts
-constexpr int v_g_steps = 100;      // (y-axis resolution)
+constexpr double v_g_min = -5;       // Volts
+constexpr double v_g_max =  5;      // Volts
+constexpr int v_g_steps = 400;      // (y-axis resolution)
 
 constexpr double v_sd_min = -0.1;   // Volts
-constexpr double v_sd_max =  1;     // Volts
-constexpr int v_sd_steps = 100;     // (x-axis resolution)
+constexpr double v_sd_max =  0.4;     // Volts
+constexpr int v_sd_steps = 200;     // (x-axis resolution)
 
 
 constexpr double source_dos (double energy) {
@@ -56,7 +57,7 @@ constexpr double drain_dos (double energy) {
 constexpr double s_fermi_energy = 0.0*e;  // Joules
 
 
-constexpr double evolution_step_size = 1e-1;
+constexpr double evolution_step_size = 1e-2;
 constexpr double convergence_criterion = 1e-10;
 
 
@@ -228,7 +229,7 @@ v_pair voltage_pair_from_index (int index) {
                           *(double)(v_g_max - v_g_min)/(double)v_g_steps);
     } else {
         voltage.gate = v_g_max
-                       - ((index % v_g_steps)
+                       - (((index % v_g_steps) + 1)
                           *(double)(v_g_max - v_g_min)/(double)v_g_steps);
     }
 
@@ -244,7 +245,8 @@ v_pair voltage_pair_from_index (int index) {
 
 int main () {
 
-    std::ofstream outfile("output.csv", std::ofstream::out);
+    std::ofstream outfile ("output.csv", std::ofstream::out);
+    // outfile << n_levels << "\n";  // Needed for visualization later.
 
     weights guess = { 1 };  // Guess that the dot is in an empty config
                             // to start with. The other elements get
@@ -321,9 +323,13 @@ int main () {
         }
         outfile << " ; " << current/e;
 
+        // for (cfg config = 0; config < n_configs; ++config) {
+        //     if (guess[config] > 1e-5)
+        //         outfile << " ; "<< config << " ; " << guess[config];
+        // }
+
         for (cfg config = 0; config < n_configs; ++config) {
-            if (guess[config] > 1e-50)
-                outfile << " ; "<< config << " ; " << guess[config];
+            outfile << " ; " << guess[config];
         }
 
         outfile << "\n";

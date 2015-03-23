@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <vector>
+#include <fstream>
 
 
 /* PHYSICAL CONSTANTS */
@@ -15,7 +16,7 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 /* USER CONFIGURATION */
 
 constexpr double single_electron_energies[] = {
-    -0.1*e, -0.1*e, 0.1*e, 0.1*e
+    -0.1*e, -0.1*e, 0.1*e, 0.1*e, 0.2*e, 0.2*e, 0.3*e, 0.3*e
 };  // Joules
 
 constexpr double gate_capacitance =   1e-19;  // Farads
@@ -26,13 +27,13 @@ constexpr double extra_capacitance =  1e-19;  // Farads
 constexpr double source_width = 1;  // arb.
 constexpr double drain_width =  1;  // arb.
 
-constexpr double v_g_min = 0;      // Volts
-constexpr double v_g_max = 0;      // Volts
-constexpr int v_g_steps =  1;      // (y-axis resolution)
+constexpr double v_g_min = 0;       // Volts
+constexpr double v_g_max = 0.1;     // Volts
+constexpr int v_g_steps = 100;      // (y-axis resolution)
 
-constexpr double v_sd_min = -0.1;  // Volts
-constexpr double v_sd_max =  1;    // Volts
-constexpr int v_sd_steps = 20;     // (x-axis resolution)
+constexpr double v_sd_min = -0.1;   // Volts
+constexpr double v_sd_max =  1;     // Volts
+constexpr int v_sd_steps = 100;     // (x-axis resolution)
 
 
 constexpr double source_dos (double energy) {
@@ -85,7 +86,7 @@ typedef struct {
     cfg to;  // Row
     cfg from;  // Column
     double value;
-} matrix_element;
+} matrix_elem;
 
 typedef double mu_spectrum[n_levels];
 typedef mu_spectrum mu_container[n_configs];
@@ -186,7 +187,7 @@ double chemical_potential (bool occupied, double single_electron_energy,
 
 /* Rate matrix elements (Beenakker rate equations) */
 
-matrix_element diagonal_matrix_element (cfg config, mu_spectrum spectrum,
+matrix_elem diag (cfg config, mu_spectrum spectrum,
                                         double v_sd) {
     double value = 0;
     for (int level = 0; level < n_levels; ++level) {
@@ -200,7 +201,7 @@ matrix_element diagonal_matrix_element (cfg config, mu_spectrum spectrum,
     return { config, config, value };
 }
 
-matrix_element offdiagonal_matrix_element (cfg to, cfg from, int level,
+matrix_elem offdiag (cfg to, cfg from, int level,
                                            double mu,
                                            double v_sd) {
     double value;
@@ -218,17 +219,22 @@ matrix_element offdiagonal_matrix_element (cfg to, cfg from, int level,
 /* MISCELLANEOUS HELPER */
 
 v_pair voltage_pair_from_index (int index) {
-    // TODO: Have a 'snake' option.
 
     v_pair voltage;
 
-    voltage.gate = v_g_min
-                   + ((index % v_g_steps)
-                     *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+    if ((int)floor((double)index/(double)v_g_steps) % 2 == 0) {
+        voltage.gate = v_g_min
+                       + ((index % v_g_steps)
+                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+    } else {
+        voltage.gate = v_g_max
+                       - ((index % v_g_steps)
+                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+    }
 
     voltage.sd = v_sd_min
-                   + (floor((double)index/(double)v_g_steps))
-                     *(double)(v_sd_max - v_sd_min)/(double)(v_sd_steps);
+                   + (floor((double)index/(double)v_g_steps)
+                      *(double)(v_sd_max - v_sd_min)/(double)(v_sd_steps));
 
     return voltage;
 }
@@ -238,13 +244,20 @@ v_pair voltage_pair_from_index (int index) {
 
 int main () {
 
+    std::ofstream outfile("output.csv", std::ofstream::out);
+
+    weights guess = { 1 };  // Guess that the dot is in an empty config
+                            // to start with. The other elements get
+                            // initialised to 0.
+
     for (int voltage_index = 0;
          voltage_index < v_g_steps*v_sd_steps;
          ++voltage_index) {
 
         auto voltage = voltage_pair_from_index(voltage_index);
-        std::cout << "\nv_g = " << voltage.gate << " ; "
-                  << "v_sd = " << voltage.sd << "\n";
+        outfile << voltage.gate << " ; " << voltage.sd;
+        std::cout << "v_g:" << voltage.gate << " ; "
+                  << "v_sd:" << voltage.sd;
 
         mu_container mu;
         for (cfg config = 0; config < n_configs; ++config) {
@@ -257,27 +270,24 @@ int main () {
 
         // Use a std::vector because we might decide later to make more matrix
         // elements non-zero, e.g. for radiative decay.
-        std::vector<matrix_element> matrix;
+        std::vector<matrix_elem> matrix;
         // TODO: Store just one row of the matrix in memory.
 
         for (cfg to = 0; to < n_configs; ++to) {
+            // TODO: Only store matrix elements greater than some tolerance.
+
             // "to" should actually be "away" here.
             matrix.push_back(
-                diagonal_matrix_element(
-                    to, mu[to], voltage.sd));
+                diag(to, mu[to], voltage.sd));
 
             for (int level = 0; level < n_levels; ++level) {
                 cfg from = flipped_occupation(to, level);
                 matrix.push_back(
-                    offdiagonal_matrix_element(
-                        to, from, level, mu[from][level], voltage.sd));
+                    offdiag(to, from, level, mu[from][level], voltage.sd));
             }
         }
 
-        weights guess = { 1 };  // Guess that the dot is in an empty config
-                                // to start with. The other elements get
-                                // initialised to 0.
-                                // TODO: Move this outside `for` loop.
+
         ddt_weights ratechange;
 
         bool converged = false;
@@ -288,7 +298,7 @@ int main () {
             converged = true;  // To be &&'d.
             for (cfg config = 0; config < n_configs; ++config) {
                 ratechange[config] = 0;
-                // We assume that the matrix elements are ordererd by value of
+                // We assume that matrix elements are ordered by value of
                 // matrix[elem].to.
                 while (elem < matrix.size() && matrix[elem].to == config) {
                     ratechange[config] +=
@@ -297,16 +307,10 @@ int main () {
                 }
                 guess[config] += ratechange[config]*evolution_step_size;
                 converged = converged
-                            && (ratechange[config]*evolution_step_size
-                                < convergence_criterion);
+                            && (ratechange[config] < convergence_criterion);
             }
         }
-        std::cout << "\ncycles for convergence: " << cycles << "\n";
-
-        std::cout << "\nweights:\n";
-        for (double weight : guess) {
-            std::cout << weight << " ";
-        }
+        std::cout << " ; " << cycles << " cycles\n";
 
         double current = 0;
         for (cfg config = 0; config < n_configs; ++config) {
@@ -315,7 +319,14 @@ int main () {
                     mu[config][level], occupied(config, level), voltage.sd);
             }
         }
-        std::cout << "\ncurrent is " << current/e << "\n\n";
+        outfile << " ; " << current/e;
+
+        for (cfg config = 0; config < n_configs; ++config) {
+            if (guess[config] > 1e-50)
+                outfile << " ; "<< config << " ; " << guess[config];
+        }
+
+        outfile << "\n";
     }
 
 }

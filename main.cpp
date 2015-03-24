@@ -88,8 +88,9 @@ typedef struct {
 } matrix_elem;
 
 typedef double mu_spectrum[n_levels];
-typedef mu_spectrum mu_container[n_configs];
-// TODO: typedef double mu_container[occupied][level][occ_num];
+// typedef mu_spectrum mu_container[n_configs];
+
+typedef double mu_container[n_levels][n_levels - 1];
 // Should do this. Otherwise there are many redundant mu calculations.
 
 typedef double weights[n_configs];
@@ -185,8 +186,7 @@ double chemical_potential (bool occupied, double single_electron_energy,
 
 /* Rate matrix elements (Beenakker rate equations) */
 
-matrix_elem diag (cfg config, mu_spectrum spectrum,
-                                        double v_sd) {
+matrix_elem diag (cfg config, mu_spectrum spectrum, double v_sd) {
     double value = 0;
     for (int level = 0; level < n_levels; ++level) {
         auto mu = spectrum[level];
@@ -265,11 +265,11 @@ int main () {
 
         /* For each possible config, find all the chemical potentials. */
         mu_container mu;
-        for (cfg config = 0; config < n_configs; ++config) {
-            for (int level = 0; level < n_levels; ++level) {
-                mu[config][level] = chemical_potential(
-                    occupied(config, level), single_electron_energies[level],
-                    sum_occupation(config), voltage);
+        for (int level = 0; level < n_levels; ++level) {
+            for (int occupation = 0; occupation < n_levels - 1; ++occupation) {
+                mu[level][occupation] = chemical_potential(
+                    false, single_electron_energies[level], occupation,
+                    voltage);
             }
         }
 
@@ -281,11 +281,21 @@ int main () {
         for (cfg to = 0; to < n_configs; ++to) {
             // TODO: Only store matrix elements greater than some tolerance.
             // For "to" on the following line only, read "away".
-            matrix.push_back(diag(to, mu[to], voltage.sd));
+            mu_spectrum mu_to;
+            int occupation = sum_occupation(to);
+            for (int level = 0; level < n_levels; ++level) {
+                mu_to[level] = mu[level][occupation
+                                         - (occupied(to, level) ? 1 : 0)];
+            }
+            matrix.push_back(diag(to, mu_to, voltage.sd));
             for (int level = 0; level < n_levels; ++level) {
                 cfg from = flipped_occupation(to, level);
                 matrix.push_back(
-                    offdiag(to, from, level, mu[from][level], voltage.sd));
+                    offdiag(
+                        to, from, level,
+                        mu[level][sum_occupation(from)
+                                  - (occupied(from, level) ? 1 : 0)],
+                        voltage.sd));
             }
         }
 
@@ -353,7 +363,9 @@ int main () {
         for (cfg config = 0; config < n_configs; ++config) {
             for (int level = 0; level < n_levels; ++level) {
                 current += guess[config]*current_through_level(
-                    mu[config][level], occupied(config, level), voltage.sd);
+                    mu[level][sum_occupation(config)
+                              - (occupied(config, level) ? 1 : 0)],
+                    occupied(config, level), voltage.sd);
             }
         }
         outfile << " ; " << current/e;

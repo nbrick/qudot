@@ -12,7 +12,7 @@ import data_handling as dat
 
 
 with open("output.csv", newline="") as csv_file:
-    print("Processing CSV...")
+    print("Processing CSV... (This might take a few seconds.)")
     lines = csv.reader(csv_file, delimiter=";", quoting=csv.QUOTE_NONNUMERIC)
     lines = sorted(sorted(lines, key=lambda x: x[1]), key=lambda x: x[0])
     v_sd_range = np.asarray(sorted(list(set([line[1] for line in lines]))))
@@ -31,11 +31,6 @@ black = np.array([[0, 0, 0]])
 white = np.array([[1, 1, 1]])
 
 whitespace = "".join(["\n" for _ in range(100)])
-
-
-def bit(number, index):
-    """Return the indexth bit of number."""
-    return (number >> index) & 1
 
 
 def i_sd(v_g=0):
@@ -115,7 +110,7 @@ def heatmap(axes=None):
 
 def pretty_bin(number, max_number):
     width = ceil(log2(max_number))
-    return "".join([colored("*", "white") if bit(number, index)
+    return "".join([colored("*", "white") if dat.bit(number, index)
                     else colored("|", "red")
                     for index in range(width)])
 
@@ -243,3 +238,5 @@ def ui(v_sd=0, v_g=0):
 
     # Launch the matplotlib window.
     plot.show(block=False)
+
+print("Try ui(), or heatmap().")

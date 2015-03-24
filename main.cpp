@@ -58,8 +58,8 @@ constexpr double drain_dos (double energy) {
 constexpr double s_fermi_energy = 0.0*e;  // Joules
 
 /* Semiclassical simulation properties */
-constexpr double evolution_step_size = 5e-2;
-constexpr double convergence_criterion = 1e-10;
+constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double convergence_criterion = 1e-5;
 
 
 /* COMPILE-TIME CALCULATIONS */
@@ -93,7 +93,6 @@ typedef mu_spectrum mu_container[n_configs];
 // Should do this. Otherwise there are many redundant mu calculations.
 
 typedef double weights[n_configs];
-typedef double ddt_weights[n_configs];
 
 
 /* BINARY REPRESENTATION OF CONFIGURATIONS */
@@ -298,26 +297,60 @@ int main () {
         }
 
         /* Iterate on dw/dt = M w until steady state is found. */
-        // TODO: Use Runge-Kutta.
-        ddt_weights ratechange;
         bool converged = false;
         int cycles = 0;
         while (!converged) {
             ++cycles;
-            cfg elem = 0;
             converged = true;  // To be &&'d.
+            /* Runge-Kutta (RK4) iteration happens here. */
+            double k_1[n_configs] = { 0 };
+            cfg elem = 0;  // This is a summation variable.
             for (cfg config = 0; config < n_configs; ++config) {
-                ratechange[config] = 0;
                 // We assume that matrix elements are ordered by value of
-                // matrix[elem].to.
+                // matrix[elem].to (as below).
                 while (elem < matrix.size() && matrix[elem].to == config) {
-                    ratechange[config] +=
-                        matrix[elem].value*guess[matrix[elem].from];
+                    k_1[config] += matrix[elem].value*guess[matrix[elem].from];
                     ++elem;
                 }
-                guess[config] += ratechange[config]*evolution_step_size;
-                converged = converged
-                            && (ratechange[config] < convergence_criterion);
+            }
+            double k_2[n_configs] = { 0 };
+            elem = 0;  // Reset summation variable.
+            for (cfg config = 0; config < n_configs; ++config) {
+                while (elem < matrix.size() && matrix[elem].to == config) {
+                    k_2[config] += matrix[elem].value
+                                   * (guess[matrix[elem].from]
+                                      + (k_1[matrix[elem].from] * h/2.0));
+                    ++elem;
+                }
+            }
+            double k_3[n_configs] = { 0 };
+            elem = 0;
+            for (cfg config = 0; config < n_configs; ++config) {
+                while (elem < matrix.size() && matrix[elem].to == config) {
+                    k_3[config] += matrix[elem].value
+                                   * (guess[matrix[elem].from]
+                                      + (k_2[matrix[elem].from] * h/2.0));
+                    ++elem;
+                }
+            }
+            double k_4[n_configs] = { 0 };
+            elem = 0;
+            for (cfg config = 0; config < n_configs; ++config) {
+                while (elem < matrix.size() && matrix[elem].to == config) {
+                    k_4[config] += matrix[elem].value
+                                   * (guess[matrix[elem].from]
+                                      + (k_3[matrix[elem].from] * h));
+                    ++elem;
+                }
+            }
+            for (cfg config = 0; config < n_configs; ++config) {
+                double increment = (k_1[config]
+                                    + 2*k_2[config]
+                                    + 2*k_3[config]
+                                    + k_4[config])
+                                   * h/6.0;
+                guess[config] += increment;
+                converged = converged && (increment < convergence_criterion);
             }
         }
         std::cout << " ; " << cycles << " cycles\n";

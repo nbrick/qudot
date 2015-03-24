@@ -14,7 +14,7 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 /* USER CONFIGURATION */
 
 /* Temperature */
-constexpr double temp = 30;  // Kelvin
+constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
@@ -30,7 +30,7 @@ constexpr double extra_capacitance =  1e-19;  // Farads
 /* Tunnel rates (assumed to be independent of electron energy) */
 // TODO: Relax this assumption.
 constexpr double source_width = 1;  // arb.
-constexpr double drain_width =  1;  // arb.
+constexpr double drain_width =  2;  // arb.
 
 /* Voltage-space to be explored */
 constexpr double v_g_min = -5;  // Volts
@@ -39,7 +39,7 @@ constexpr int v_g_steps = 200;  // (y axis resolution)
 
 constexpr double v_sd_min = 0;  // Volts
 constexpr double v_sd_max = 0.08;  // Volts
-constexpr int v_sd_steps = 100;  // (x axis resolution)
+constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
@@ -256,13 +256,6 @@ int main () {
     for (int voltage_index = 0;
          voltage_index < v_g_steps*v_sd_steps;
          ++voltage_index) {
-
-        /* Normalise weights guess to prevent drift (and for ease of input). */
-        double sum_weights = 0;
-        for (cfg config = 0; config < n_configs; ++config)
-            sum_weights += guess[config];
-        for (cfg config = 0; config < n_configs; ++config)
-            guess[config] /= sum_weights;
 
         /* Choose a point in voltage-space. */
         auto voltage = voltage_pair_from_index(voltage_index);

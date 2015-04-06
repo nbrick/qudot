@@ -49,6 +49,7 @@ constexpr double source_dos (double energy) {
     return 1;
 }
 constexpr double d_fermi_energy = 0.0*e;  // Joules
+
 constexpr double drain_dos (double energy) {
     if (energy > 0.0) {
         // Do nothing. (Suppress 'unused' warning.)

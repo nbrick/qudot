@@ -93,7 +93,7 @@ def heatmap(axes=None):
         iw_list, voltage_area)
     heatmap_ = heatmap_axes.imshow(current_function, extent=extent,
                                    interpolation="nearest", aspect="auto",
-                                   cmap=cm.rainbow)
+                                   cmap=cm.binary)
     plot.colorbar(heatmap_, cax=colorbar_axes)
 
     heatmap_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
@@ -208,7 +208,7 @@ def ui(v_sd=0, v_g=0):
                 weight_bar = "".join([colored("=", "green") if point < weight
                                       else " "
                                       for point
-                                      in np.linspace(0, 1-1e-10, 40)])
+                                      in np.linspace(0, 1 - 1e-10, 40)])
 
                 print(" " + pretty_bin(index, len(weights)),
                       "%.3f" % weight, weight_bar)

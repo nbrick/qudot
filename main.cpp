@@ -18,27 +18,27 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    -0.1*e, -0.1*e, -0.09*e, -0.09*e, -0.07*e, -0.07*e, -0.04*e, -0.04*e
+    0.0*e, 0.0*e, 0.0*e, 0.0*e, 0.0*e, 0.0*e, 0.0*e, 0.0*e
 };  // Joules
 
 /* Dot-system capacitances */
 constexpr double gate_capacitance =   1e-19;  // Farads
 constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  3e-18;  // Farads
+constexpr double drain_capacitance =  1e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 /* Tunnel rates (assumed to be independent of electron energy) */
 // TODO: Relax this assumption.
 constexpr double source_width = 1;  // arb.
-constexpr double drain_width =  2;  // arb.
+constexpr double drain_width =  1;  // arb.
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -5;  // Volts
-constexpr double v_g_max = 10;  // Volts
+constexpr double v_g_min = 0;  // Volts
+constexpr double v_g_max = 6.01;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = 0;  // Volts
-constexpr double v_sd_max = 0.08;  // Volts
+constexpr double v_sd_min = -0.2;  // Volts
+constexpr double v_sd_max = 0.201;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
@@ -49,6 +49,7 @@ constexpr double source_dos (double energy) {
     return 1;
 }
 constexpr double d_fermi_energy = 0.0*e;  // Joules
+
 constexpr double drain_dos (double energy) {
     if (energy > 0.0) {
         // Do nothing. (Suppress 'unused' warning.)

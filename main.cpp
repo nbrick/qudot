@@ -21,15 +21,12 @@ constexpr double single_electron_energies[] = {
     -0.1*e, -0.1*e, -0.09*e, -0.09*e, -0.07*e, -0.07*e, -0.04*e, -0.04*e
 };  // Joules
 
-constexpr int n_levels = sizeof(single_electron_energies)
-                         /sizeof(single_electron_energies[0]);
-
 /* Tunnel widths (by dot level) */
-constexpr double source_widths[n_levels] {
+constexpr double source_widths[] {
     1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
 };
 
-constexpr double drain_widths[n_levels] {
+constexpr double drain_widths[] {
     1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
 };
 
@@ -71,6 +68,18 @@ constexpr double convergence_criterion = 1e-5;
 
 
 /* COMPILE-TIME CALCULATIONS */
+
+constexpr int n_levels = sizeof(single_electron_energies)
+                         /sizeof(single_electron_energies[0]);
+
+constexpr int n_source_rates = sizeof(source_widths)
+                               /sizeof(source_widths[0]);
+
+constexpr int n_drain_rates = sizeof(drain_widths)
+                               /sizeof(drain_widths[0]);
+
+static_assert(n_levels == n_source_rates && n_levels == n_drain_rates,
+              "Wrong number of tunnelling rates inputted by user.");
 
 constexpr double total_capacitance = gate_capacitance + source_capacitance
                                      + drain_capacitance + extra_capacitance;

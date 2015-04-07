@@ -21,23 +21,30 @@ constexpr double single_electron_energies[] = {
     -0.1*e, -0.1*e, -0.09*e, -0.09*e, -0.07*e, -0.07*e, -0.04*e, -0.04*e
 };  // Joules
 
+constexpr int n_levels = sizeof(single_electron_energies)
+                         /sizeof(single_electron_energies[0]);
+
+/* Tunnel widths (by dot level) */
+constexpr double source_widths[n_levels] {
+    1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
+};
+
+constexpr double drain_widths[n_levels] {
+    1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
+};
+
 /* Dot-system capacitances */
 constexpr double gate_capacitance =   1e-19;  // Farads
 constexpr double source_capacitance = 1e-18;  // Farads
 constexpr double drain_capacitance =  3e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
-/* Tunnel rates (assumed to be independent of electron energy) */
-// TODO: Relax this assumption.
-constexpr double source_width = 1;  // arb.
-constexpr double drain_width =  2;  // arb.
-
 /* Voltage-space to be explored */
-constexpr double v_g_min = -5;  // Volts
-constexpr double v_g_max = 10;  // Volts
+constexpr double v_g_min = 0.0;  // Volts
+constexpr double v_g_max = 10.;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = 0;  // Volts
+constexpr double v_sd_min = 0.0;  // Volts
 constexpr double v_sd_max = 0.08;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
@@ -76,9 +83,6 @@ typedef struct {
     double sd;  // Source-drain
 } v_pair;
 
-constexpr int n_levels = sizeof(single_electron_energies)
-                         /sizeof(single_electron_energies[0]);
-
 typedef unsigned long cfg;
 constexpr cfg n_configs = 1 << n_levels;  // 2^n_levels
 
@@ -114,7 +118,9 @@ int flipped_occupation (cfg config, int level) {
 }
 
 
-/* THERMODYNAMICS */
+/* THE PHYSICS */
+
+/* Thermodynamics */
 
 double fermi (double energy, double chem_pot) {
     double exponent = (energy - chem_pot)/(k_B*temp);
@@ -125,9 +131,6 @@ double fermi (double energy, double chem_pot) {
     else
         return 1.0/(exp(exponent) + 1);
 }
-
-
-/* THE PHYSICS */
 
 /* Energy shifts in leads owing to applied bias */
 
@@ -141,35 +144,38 @@ constexpr double d_shift (double energy, double v_sd) {
 
 /* Tunnel rates */
 
-double in_from_source (double mu, double v_sd) {
-    return source_width
+double in_from_source (double mu, double v_sd, int level) {
+    return source_widths[level]
            * source_dos(mu - s_shift(0.0, v_sd))
            * fermi(mu, s_shift(s_fermi_energy, v_sd));
 }
 
-double in_from_drain (double mu, double v_sd) {
-    return drain_width
+double in_from_drain (double mu, double v_sd, int level) {
+    return drain_widths[level]
            * drain_dos(mu - d_shift(0.0, v_sd))
            * fermi(mu, d_shift(d_fermi_energy, v_sd));
 }
 
-double out_to_source (double mu, double v_sd) {
-    return source_width
+double out_to_source (double mu, double v_sd, int level) {
+    return source_widths[level]
            * source_dos(mu - s_shift(0.0, v_sd))
            * (1 - fermi(mu, s_shift(s_fermi_energy, v_sd)));
 }
 
-double out_to_drain (double mu, double v_sd) {
-    return drain_width
+double out_to_drain (double mu, double v_sd, int level) {
+    return drain_widths[level]
            * drain_dos(mu - d_shift(0.0, v_sd))
            * (1 - fermi(mu, d_shift(d_fermi_energy, v_sd)));
 }
 
-double current_through_level (double mu, bool occupied, double v_sd) {
+double current_through_level (double mu, bool occupied, double v_sd, int level)
+{
     if (occupied)
-        return -e*(out_to_drain(mu, v_sd) - out_to_source(mu, v_sd));
+        return -e*(out_to_drain(mu, v_sd, level)
+                   - out_to_source(mu, v_sd, level));
     else
-        return -e*(in_from_source(mu, v_sd) - in_from_drain(mu, v_sd));
+        return -e*(in_from_source(mu, v_sd, level)
+                   - in_from_drain(mu, v_sd, level));
 }
 
 /* Charging energy (constant interaction) */
@@ -186,15 +192,16 @@ double chemical_potential (bool occupied, double single_electron_energy,
 
 /* Rate matrix elements (Beenakker rate equations) */
 
-matrix_elem diag (cfg config, mu_spectrum spectrum,
-                                        double v_sd) {
-    double value = 0;
+matrix_elem diag (cfg config, mu_spectrum spectrum, double v_sd) {
+    double value = 0.0;
     for (int level = 0; level < n_levels; ++level) {
         auto mu = spectrum[level];
         if (occupied(config, level))
-            value -= (out_to_source(mu, v_sd) + out_to_drain(mu, v_sd));
+            value -= (out_to_source(mu, v_sd, level)
+                      + out_to_drain(mu, v_sd, level));
         else
-            value -= (in_from_source(mu, v_sd) + in_from_drain(mu, v_sd));
+            value -= (in_from_source(mu, v_sd, level)
+                      + in_from_drain(mu, v_sd, level));
     }
     return { config, config, value };
 }
@@ -202,9 +209,11 @@ matrix_elem diag (cfg config, mu_spectrum spectrum,
 matrix_elem offdiag (cfg to, cfg from, int level, double mu, double v_sd) {
     double value;
     if (occupied(from, level))
-        value = out_to_source(mu, v_sd) + out_to_drain(mu, v_sd);
+        value = out_to_source(mu, v_sd, level)
+                + out_to_drain(mu, v_sd, level);
     else
-        value = in_from_source(mu, v_sd) + in_from_drain(mu, v_sd);
+        value = in_from_source(mu, v_sd, level)
+                + in_from_drain(mu, v_sd, level);
     return { to, from, value };
 }
 
@@ -250,8 +259,8 @@ int main () {
     std::ofstream outfile ("output.csv", std::ofstream::out);
     // outfile << n_levels << "\n";  // Needed for visualization later.
 
-    /* 'Guess' that the dot is initially empty; w = { 1, 0, 0, ... }. */
-    weights guess = { 1 };
+    /* 'Guess' that the dot is initially empty; w = { 1.0, 0.0, 0.0, ... }. */
+    weights guess = { 1.0 };
 
     /* Iterate through points in voltage-space. */
     for (int voltage_index = 0;
@@ -297,7 +306,7 @@ int main () {
             ++cycles;
             converged = true;  // To be &&'d.
             /* Runge-Kutta (RK4) iteration happens here. */
-            double k_1[n_configs] = { 0 };
+            double k_1[n_configs] = { 0.0 };
             cfg elem = 0;  // This is a summation variable.
             for (cfg config = 0; config < n_configs; ++config) {
                 // We assume that matrix elements are ordered by value of
@@ -307,7 +316,7 @@ int main () {
                     ++elem;
                 }
             }
-            double k_2[n_configs] = { 0 };
+            double k_2[n_configs] = { 0.0 };
             elem = 0;  // Reset summation variable.
             for (cfg config = 0; config < n_configs; ++config) {
                 while (elem < matrix.size() && matrix[elem].to == config) {
@@ -317,7 +326,7 @@ int main () {
                     ++elem;
                 }
             }
-            double k_3[n_configs] = { 0 };
+            double k_3[n_configs] = { 0.0 };
             elem = 0;
             for (cfg config = 0; config < n_configs; ++config) {
                 while (elem < matrix.size() && matrix[elem].to == config) {
@@ -327,7 +336,7 @@ int main () {
                     ++elem;
                 }
             }
-            double k_4[n_configs] = { 0 };
+            double k_4[n_configs] = { 0.0 };
             elem = 0;
             for (cfg config = 0; config < n_configs; ++config) {
                 while (elem < matrix.size() && matrix[elem].to == config) {
@@ -350,11 +359,12 @@ int main () {
         std::cout << " ; " << cycles << " cycles\n";
 
         /* Find weighted-average current and write it to file. */
-        double current = 0;
+        double current = 0.0;
         for (cfg config = 0; config < n_configs; ++config) {
             for (int level = 0; level < n_levels; ++level) {
                 current += guess[config]*current_through_level(
-                    mu[config][level], occupied(config, level), voltage.sd);
+                    mu[config][level], occupied(config, level),
+                    voltage.sd, level);
             }
         }
         outfile << " ; " << current/e;

@@ -24,43 +24,45 @@ constexpr double single_electron_energies[] = {
 /* Dot-system capacitances */
 constexpr double gate_capacitance =   1e-19;  // Farads
 constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  3e-18;  // Farads
+constexpr double drain_capacitance =  1e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 /* Tunnel rates (assumed to be independent of electron energy) */
 // TODO: Relax this assumption.
 constexpr double source_width = 1;  // arb.
-constexpr double drain_width =  2;  // arb.
+constexpr double drain_width =  1;  // arb.
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -5;  // Volts
-constexpr double v_g_max = 10;  // Volts
-constexpr int v_g_steps = 200;  // (y axis resolution)
+constexpr double v_g_min = -2;  // Volts
+constexpr double v_g_max = 5;  // Volts
+constexpr int v_g_steps = 100;  // (y axis resolution)
 
 constexpr double v_sd_min = 0;  // Volts
 constexpr double v_sd_max = 0.08;  // Volts
-constexpr int v_sd_steps = 200;  // (x axis resolution)
+constexpr int v_sd_steps = 100;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
-constexpr double source_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
-    }
-    return 1;
-}
-constexpr double d_fermi_energy = 0.0*e;  // Joules
-
-constexpr double drain_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
-    }
-    return 1;
-}
 constexpr double s_fermi_energy = 0.0*e;  // Joules
+double source_dos (double energy) {
+    if (-0.2 < energy/e && energy/e < 0.2) {
+        return 0.1;
+    } else {
+        return 1;
+    }
+}
+
+constexpr double d_fermi_energy = 0.0*e;  // Joules
+double drain_dos (double energy) {
+    if (-0.2 < energy/e && energy/e < 0.2) {
+        return 0.1;
+    } else {
+        return 1;
+    }
+}
 
 /* Semiclassical simulation properties */
 constexpr double h = 1e-1;  // Runge-Kutta evolution step size
-constexpr double convergence_criterion = 1e-5;
+constexpr double convergence_criterion = 1e-7;
 
 
 /* COMPILE-TIME CALCULATIONS */

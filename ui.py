@@ -184,7 +184,7 @@ def ui(v_sd=0, v_g=0):
     # ------
     def label_figures():
         line_plot_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$")
-        line_plot_axes.set_ylabel(r"Current $I / \mathrm{arb.}$")
+        line_plot_axes.set_ylabel(r"Conductance$")
 
     # Slider update actions
     # ---------------------
@@ -193,11 +193,12 @@ def ui(v_sd=0, v_g=0):
         replot_point_annotation(v.sd, v.g)
         v_g_line.set_ydata(v.g)
 
-        # Retrieve from memory and plot current.
-        i_vs_v_sd = dat.get_i_vs_v_sd(iw_list, v.g, voltage_area)
+        # Retrieve from memory and plot conductance.
+        conductances = dat.get_diff_conductance_vs_v_sd(
+            iw_list, v.g, voltage_area)
         line_plot_axes.clear()
         line_plot_axes.plot(v_sd_range,
-                            [current for current in i_vs_v_sd],
+                            [conductance for conductance in conductances],
                             "black")
         line_plot_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
         line_plot_axes.axvline(x=v.sd)

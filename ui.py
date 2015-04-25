@@ -82,9 +82,8 @@ def mean_occupation(v_g=0):
 def heatmap(axes=None):
     if axes is None:
         show = True
-        gs = gridspec.GridSpec(1, 2, width_ratios=[10, 1])
+        gs = gridspec.GridSpec(1, 1)
         heatmap_axes = plot.subplot(gs[0])
-        colorbar_axes = plot.subplot(gs[1])
     else:
         show = False
         heatmap_axes, colorbar_axes = axes
@@ -94,15 +93,26 @@ def heatmap(axes=None):
     heatmap_ = heatmap_axes.imshow(current_function, extent=extent,
                                    interpolation="nearest", aspect="auto",
                                    cmap=cm.binary)
-    plot.colorbar(heatmap_, cax=colorbar_axes)
 
     heatmap_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
     heatmap_axes.set_ylim([v_g_range[0], v_g_range[-1]])
 
-    heatmap_axes.set_xlabel(r"$V_{sd}/\mathrm{V}$")
-    heatmap_axes.set_ylabel(r"$V_\mathrm{g}/\mathrm{V}$")
-    colorbar_axes.set_title(
-        r"$\frac{\partial I}{\partial V_\mathrm{sd}} /\mathrm{arb.\ units}$")
+    heatmap_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$", size=25)
+    heatmap_axes.set_ylabel(r"$V_\mathrm{g}/\mathrm{V}$", size=25)
+    heatmap_axes.set_title(
+        r"$\frac{\partial I}{\partial V_\mathrm{sd}} /\mathrm{arb.\ units}$",
+        size=25, y=1.04)
+
+
+    heatmap_axes.locator_params(axis="x", nbins=5)
+
+    for tick in heatmap_axes.xaxis.get_major_ticks():
+                tick.label.set_fontsize(20)
+
+    for tick in heatmap_axes.yaxis.get_major_ticks():
+                tick.label.set_fontsize(20)
+
+    plot.subplots_adjust(bottom=0.15)
 
     if show:
         plot.show(block=False)

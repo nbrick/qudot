@@ -33,12 +33,12 @@ constexpr double source_width = 1;  // arb.
 constexpr double drain_width =  1;  // arb.
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = 0;  // Volts
-constexpr double v_g_max = 6.01;  // Volts
+constexpr double v_g_min = -0.3;  // Volts
+constexpr double v_g_max = 6.1;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = -0.2;  // Volts
-constexpr double v_sd_max = 0.201;  // Volts
+constexpr double v_sd_min = -0.21;  // Volts
+constexpr double v_sd_max = 0.21;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */

@@ -23,11 +23,11 @@ constexpr double single_electron_energies[] = {
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
 };
 
 constexpr double drain_widths[] {
-    1.0, 1.0, 0.9, 0.9, 0.8, 0.8, 0.6, 0.6
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
 };
 
 /* Dot-system capacitances */
@@ -37,12 +37,12 @@ constexpr double drain_capacitance =  1e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = 0.0;  // Volts
-constexpr double v_g_max = 10.;  // Volts
+constexpr double v_g_min = -0.3;  // Volts
+constexpr double v_g_max = 6.1;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = 0.0;  // Volts
-constexpr double v_sd_max = 0.08;  // Volts
+constexpr double v_sd_min = -0.21;  // Volts
+constexpr double v_sd_max = 0.21;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */

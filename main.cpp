@@ -17,32 +17,41 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
+constexpr double dot_homo = -5.1*e;  // Coulombs
 constexpr double single_electron_energies[] = {
-    0.0*e, 0.01*e, 0.02*e, 0.03*e, 0.04*e, 0.05*e, 0.06*e, 0.07*e
+    dot_homo + 0.000*e, dot_homo + 0.000*e,
+    dot_homo + 0.231*e, dot_homo + 0.231*e,
+    dot_homo + 0.231*e, dot_homo + 0.231*e,
+    dot_homo + 0.231*e, dot_homo + 0.231*e,
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+    1.0, 1.0, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
 };
 
 constexpr double drain_widths[] {
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+    1.0, 1.0, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
 };
 
 /* Dot-system capacitances */
-constexpr double gate_capacitance =   1e-19;  // Farads
-constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  1e-18;  // Farads
-constexpr double extra_capacitance =  1e-19;  // Farads
+// Sun et al used CdSe nanocrystals with diameter 4.2 nm.
+// The leads were Au, whose dielectric constant is 6.9.
+// Gate capacitance is known small; Sun et al could not gate the dot.
+// Total capacitance is approximately 1.6e-18 Farads,
+// given by C = 4\pi\epsilon\epsilon_0 R.
+constexpr double gate_capacitance =   1e-20;  // Farads
+constexpr double source_capacitance = 0.8e-18;  // Farads
+constexpr double drain_capacitance =  0.8e-18;  // Farads
+constexpr double extra_capacitance =  0.1e-18;  // Farads
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -0.3;  // Volts
-constexpr double v_g_max = 6.1;  // Volts
+constexpr double v_g_min = -10;  // Volts
+constexpr double v_g_max = 50;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = -0.21;  // Volts
-constexpr double v_sd_max = 0.21;  // Volts
+constexpr double v_sd_min = -1.5;  // Volts
+constexpr double v_sd_max = 1.5;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
@@ -52,7 +61,7 @@ constexpr double source_dos (double energy) {
     }
     return 1;
 }
-constexpr double d_fermi_energy = 0.0*e;  // Joules
+constexpr double d_fermi_energy = -5.1*e;  // Joules
 
 constexpr double drain_dos (double energy) {
     if (energy > 0.0) {
@@ -60,7 +69,7 @@ constexpr double drain_dos (double energy) {
     }
     return 1;
 }
-constexpr double s_fermi_energy = 0.0*e;  // Joules
+constexpr double s_fermi_energy = -5.1*e;  // Joules
 
 /* Semiclassical simulation properties */
 constexpr double h = 1e-1;  // Runge-Kutta evolution step size

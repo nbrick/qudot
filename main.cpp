@@ -20,26 +20,34 @@ constexpr double temp = 4.2;  // Kelvin
 constexpr double dot_lumo = -5.1*e;  // Coulombs
 constexpr double single_electron_energies[] = {
     dot_lumo + 0.000*e, dot_lumo + 0.000*e,
+
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
+
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
-    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
-    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
-    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
+
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
+    0.5, 0.5,
+
     1.0, 1.0,
-    1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
-    1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
+    1.0, 1.0,
+    1.0, 1.0,
+
+    2.0, 2.0,
 };
 
 constexpr double drain_widths[] {
+    0.5, 0.5,
+
     1.0, 1.0,
-    1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
-    1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
+    1.0, 1.0,
+    1.0, 1.0,
+
+    2.0, 2.0,
 };
 
 /* Dot-system capacitances */
@@ -49,13 +57,13 @@ constexpr double drain_widths[] {
 // Total capacitance is approximately 1.6e-18 Farads,
 // given by C = 4\pi\epsilon\epsilon_0 R.
 constexpr double gate_capacitance =   1e-20;  // Farads
-constexpr double source_capacitance = 0.8e-18;  // Farads
-constexpr double drain_capacitance =  0.8e-18;  // Farads
+constexpr double source_capacitance = 1.6e-18;  // Farads
+constexpr double drain_capacitance =  1.6e-18;  // Farads
 constexpr double extra_capacitance =  0.1e-18;  // Farads
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -10;  // Volts
-constexpr double v_g_max = 150;  // Volts
+constexpr double v_g_min = -50;  // Volts
+constexpr double v_g_max = 200;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
 constexpr double v_sd_min = -1.1;  // Volts
@@ -64,18 +72,28 @@ constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    // if (energy > 0.0) {
+    //     // Do nothing. (Suppress 'unused' warning.)
+    // }
+    // return 1;
+    if (energy/e > -4.8) {
+        return 0.0;
+    } else if (energy/e > -5.3) {
+        return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
+    } else {
+        return 1.0;
     }
-    return 1;
 }
 constexpr double d_fermi_energy = -5.1*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    if (energy/e > -4.8) {
+        return 0.0;
+    } else if (energy/e > -5.3) {
+        return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
+    } else {
+        return 1.0;
     }
-    return 1;
 }
 constexpr double s_fermi_energy = -5.1*e;  // Joules
 

@@ -25,19 +25,21 @@ constexpr double single_electron_energies[] = {
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
+    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
+    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
     1.0, 1.0,
     1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
-    1.3, 1.3, 1.3, 1.3,
+    1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
 };
 
 constexpr double drain_widths[] {
     1.0, 1.0,
     1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
-    1.3, 1.3, 1.3, 1.3,
+    1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
 };
 
 /* Dot-system capacitances */

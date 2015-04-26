@@ -102,11 +102,8 @@ typedef struct {
 } matrix_elem;
 
 typedef double mu_spectrum[n_levels];
-typedef mu_spectrum mu_container[n_configs];
 // TODO: typedef double mu_container[occupied][level][occ_num];
 // Should do this. Otherwise there are many redundant mu calculations.
-
-typedef double weights[n_configs];
 
 
 /* BINARY REPRESENTATION OF CONFIGURATIONS */
@@ -269,7 +266,8 @@ int main () {
     // outfile << n_levels << "\n";  // Needed for visualization later.
 
     /* 'Guess' that the dot is initially empty; w = { 1.0, 0.0, 0.0, ... }. */
-    weights guess = { 1.0 };
+    std::vector<double> guess (n_configs);
+    guess[0] = 1;
 
     /* Iterate through points in voltage-space. */
     for (int voltage_index = 0;
@@ -283,7 +281,7 @@ int main () {
                   << "v_sd:" << voltage.sd;
 
         /* For each possible config, find all the chemical potentials. */
-        mu_container mu;
+        std::vector<mu_spectrum> mu (n_configs);
         for (cfg config = 0; config < n_configs; ++config) {
             for (int level = 0; level < n_levels; ++level) {
                 mu[config][level] = chemical_potential(

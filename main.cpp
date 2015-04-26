@@ -17,21 +17,27 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
-constexpr double dot_homo = -5.1*e;  // Coulombs
+constexpr double dot_lumo = -5.1*e;  // Coulombs
 constexpr double single_electron_energies[] = {
-    dot_homo + 0.000*e, dot_homo + 0.000*e,
-    dot_homo + 0.231*e, dot_homo + 0.231*e,
-    dot_homo + 0.231*e, dot_homo + 0.231*e,
-    dot_homo + 0.231*e, dot_homo + 0.231*e,
+    dot_lumo + 0.000*e, dot_lumo + 0.000*e,
+    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
+    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
+    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
+    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
+    dot_lumo + 0.479*e, dot_lumo + 0.479*e,
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    1.0, 1.0, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
+    1.0, 1.0,
+    1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
+    1.3, 1.3, 1.3, 1.3,
 };
 
 constexpr double drain_widths[] {
-    1.0, 1.0, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
+    1.0, 1.0,
+    1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
+    1.3, 1.3, 1.3, 1.3,
 };
 
 /* Dot-system capacitances */
@@ -47,11 +53,11 @@ constexpr double extra_capacitance =  0.1e-18;  // Farads
 
 /* Voltage-space to be explored */
 constexpr double v_g_min = -10;  // Volts
-constexpr double v_g_max = 50;  // Volts
+constexpr double v_g_max = 150;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = -1.5;  // Volts
-constexpr double v_sd_max = 1.5;  // Volts
+constexpr double v_sd_min = -1.1;  // Volts
+constexpr double v_sd_max = 1.1;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
@@ -72,7 +78,7 @@ constexpr double drain_dos (double energy) {
 constexpr double s_fermi_energy = -5.1*e;  // Joules
 
 /* Semiclassical simulation properties */
-constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double h = 0.7e-1;  // Runge-Kutta evolution step size
 constexpr double convergence_criterion = 1e-5;
 
 
@@ -387,15 +393,15 @@ int main () {
         }
         outfile << " ; " << current/e;
 
-        // for (cfg config = 0; config < n_configs; ++config) {
-        //     if (guess[config] > 1e-5)
-        //         outfile << " ; "<< config << " ; " << guess[config];
-        // }
+        // // for (cfg config = 0; config < n_configs; ++config) {
+        // //     if (guess[config] > 1e-5)
+        // //         outfile << " ; "<< config << " ; " << guess[config];
+        // // }
 
-        /* Write weights vector to file for later viewing. */
-        for (cfg config = 0; config < n_configs; ++config) {
-            outfile << " ; " << guess[config];
-        }
+        // /* Write weights vector to file for later viewing. */
+        // for (cfg config = 0; config < n_configs; ++config) {
+        //     outfile << " ; " << guess[config];
+        // }
 
         outfile << "\n";
     }

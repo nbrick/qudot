@@ -21,8 +21,8 @@ with open("output.csv", newline="") as csv_file:
     iw_list = []
     for line in lines:
         current = line[2]
-        weights = line[3:]
-        iw_list.append((current, weights))
+        # weights = line[3:]
+        iw_list.append((current, []))
 
 
 # Define some colors in the format required by matplotlib.

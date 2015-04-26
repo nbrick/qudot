@@ -137,7 +137,7 @@ int sum_occupation (cfg config) {
     return sum;
 }
 
-int flipped_occupation (cfg config, int level) {
+cfg flipped_occupation (cfg config, int level) {
     return config ^ (1 << level);
 }
 
@@ -262,15 +262,15 @@ v_pair voltage_pair_from_index (int index) {
     if ((int)floor((double)index/(double)v_g_steps) % 2 == 0)
         voltage.gate = v_g_min
                        + ((index % v_g_steps)
-                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+                          *(v_g_max - v_g_min)/(double)v_g_steps);
     else
         voltage.gate = v_g_max
                        - (((index % v_g_steps) + 1)
-                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+                          *(v_g_max - v_g_min)/(double)v_g_steps);
 
     voltage.sd = v_sd_min
                    + (floor((double)index/(double)v_g_steps)
-                      *(double)(v_sd_max - v_sd_min)/(double)(v_sd_steps));
+                      *(v_sd_max - v_sd_min)/(double)(v_sd_steps));
 
     return voltage;
 }

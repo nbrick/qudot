@@ -22,8 +22,6 @@ constexpr double single_electron_energies[] = {
     dot_lumo + 0.000*e, dot_lumo + 0.000*e,
 
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
-    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
-    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
 
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
 
@@ -31,20 +29,16 @@ constexpr double single_electron_energies[] = {
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    0.5, 0.5,
+    0.7, 0.7,
 
-    1.0, 1.0,
-    1.0, 1.0,
-    1.0, 1.0,
+    1.4, 1.4,
 
-    2.0, 2.0,
+    2.8, 2.8,
 };
 
 constexpr double drain_widths[] {
     0.5, 0.5,
 
-    1.0, 1.0,
-    1.0, 1.0,
     1.0, 1.0,
 
     2.0, 2.0,
@@ -72,28 +66,25 @@ constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    // if (energy > 0.0) {
-    //     // Do nothing. (Suppress 'unused' warning.)
-    // }
-    // return 1;
-    if (energy/e > -4.8) {
-        return 0.0;
-    } else if (energy/e > -5.3) {
-        return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
-    } else {
-        return 1.0;
+    if (energy > 0.0) {
+        // Do nothing. (Suppress 'unused' warning.)
     }
+    return 1;
+    // if (energy/e > -4.8) {
+    //     return 0.0;
+    // } else if (energy/e > -5.3) {
+    //     return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
+    // } else {
+    //     return 1.0;
+    // }
 }
 constexpr double d_fermi_energy = -5.1*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy/e > -4.8) {
-        return 0.0;
-    } else if (energy/e > -5.3) {
-        return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
-    } else {
-        return 1.0;
+    if (energy > 0.0) {
+        // Do nothing. (Suppress 'unused' warning.)
     }
+    return 1;
 }
 constexpr double s_fermi_energy = -5.1*e;  // Joules
 

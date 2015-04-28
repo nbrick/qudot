@@ -13,6 +13,15 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 
 /* USER CONFIGURATION */
 
+// Note: If the simulation halts, try reducing the Runge-Kutta evolution step
+// size, listed below. A starting point is 1e-1 but for complex systems this
+// may need to be reduced as far as 1e-2, or perhaps further. Larger step size
+// means a faster simulation.
+
+/* Semiclassical simulation properties */
+constexpr double h = 0.3e-1;  // Runge-Kutta evolution step size
+constexpr double convergence_criterion = 1e-5;
+
 /* Temperature */
 constexpr double temp = 4.2;  // Kelvin
 
@@ -22,6 +31,7 @@ constexpr double single_electron_energies[] = {
     dot_lumo + 0.000*e, dot_lumo + 0.000*e,
 
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
+    dot_lumo + 0.231*e, dot_lumo + 0.231*e,
 
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
 
@@ -29,16 +39,18 @@ constexpr double single_electron_energies[] = {
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    0.7, 0.7,
+    3.0, 3.0,
 
-    1.4, 1.4,
+    6.0, 6.0,
+    6.0, 6.0,
 
-    2.8, 2.8,
+    12.0, 12.0,
 };
 
 constexpr double drain_widths[] {
     0.5, 0.5,
 
+    1.0, 1.0,
     1.0, 1.0,
 
     2.0, 2.0,
@@ -87,10 +99,6 @@ constexpr double drain_dos (double energy) {
     return 1;
 }
 constexpr double s_fermi_energy = -5.1*e;  // Joules
-
-/* Semiclassical simulation properties */
-constexpr double h = 0.7e-1;  // Runge-Kutta evolution step size
-constexpr double convergence_criterion = 1e-5;
 
 
 /* COMPILE-TIME CALCULATIONS */

@@ -78,10 +78,13 @@ constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    if (energy/e < -5.7) {
+        return 0;
+    } else if (energy/e < -5.2) {
+        return 0 + (energy/e + 5.7)/(-5.2 + 5.7);
+    } else {
+        return 1;
     }
-    return 1;
     // if (energy/e > -4.8) {
     //     return 0.0;
     // } else if (energy/e > -5.3) {
@@ -93,10 +96,13 @@ constexpr double source_dos (double energy) {
 constexpr double d_fermi_energy = -5.1*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    if (energy/e < -5.3) {
+        return 0;
+    } else if (energy/e < -5.2) {
+        return 0 + (energy/e + 5.3)/(-5.2 + 5.3);
+    } else {
+        return 1;
     }
-    return 1;
 }
 constexpr double s_fermi_energy = -5.1*e;  // Joules
 

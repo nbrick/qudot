@@ -18,7 +18,7 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.0*e, 0.01*e, 0.02*e, 0.03*e, 0.04*e, 0.05*e, 0.06*e, 0.07*e
+    0.0*e, 0.08*e, 0.16*e, 0.24*e, 0.32*e, 0.40*e, 0.48*e, 0.56*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */
@@ -31,10 +31,10 @@ constexpr double drain_widths[] {
 };
 
 /* Dot-system capacitances */
-constexpr double gate_capacitance =   1e-19;  // Farads
-constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  1e-18;  // Farads
-constexpr double extra_capacitance =  1e-19;  // Farads
+constexpr double gate_capacitance =   8e-19;  // Farads
+constexpr double source_capacitance = 8e-18;  // Farads
+constexpr double drain_capacitance =  8e-18;  // Farads
+constexpr double extra_capacitance =  8e-19;  // Farads
 
 /* Voltage-space to be explored */
 constexpr double v_g_min = -0.3;  // Volts

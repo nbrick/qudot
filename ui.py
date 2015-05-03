@@ -187,7 +187,7 @@ def ui(v_sd=0, v_g=0):
     # ------
     def label_figures():
         line_plot_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$")
-        line_plot_axes.set_ylabel(r"Conductance$")
+        line_plot_axes.set_ylabel(r"Current $I / \mathrm{arb.}$")
 
     # Slider update actions
     # ---------------------
@@ -196,12 +196,11 @@ def ui(v_sd=0, v_g=0):
         replot_point_annotation(v.sd, v.g)
         v_g_line.set_ydata(v.g)
 
-        # Retrieve from memory and plot conductance.
-        conductances = dat.get_diff_conductance_vs_v_sd(
-            iw_list, v.g, voltage_area)
+        # Retrieve from memory and plot current.
+        i_vs_v_sd = dat.get_i_vs_v_sd(iw_list, v.g, voltage_area)
         line_plot_axes.clear()
         line_plot_axes.plot(v_sd_range,
-                            [conductance for conductance in conductances],
+                            [current for current in i_vs_v_sd],
                             "black")
         line_plot_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
         line_plot_axes.axvline(x=v.sd)
@@ -214,8 +213,10 @@ def ui(v_sd=0, v_g=0):
             dat.get_index_from_voltage_pair(v.sd, v.g, voltage_area),
             voltage_area)
 
-        for index, weight in sorted([(index, weight)
-                                     for index, weight in weights],
+        occupancy_weights = np.zeros(n_levels)
+
+        for configuration, weight in sorted([(configuration, weight)
+                                     for configuration, weight in weights],
                                     key=lambda x: x[1], reverse=False):
 
                 weight_bar = "".join([colored("=", "green") if point < weight
@@ -223,7 +224,23 @@ def ui(v_sd=0, v_g=0):
                                       for point
                                       in np.linspace(0, 1 - 1e-10, 40)])
 
-                print(" " + pretty_bin(index, 2**n_levels),
+                print(" " + pretty_bin(configuration, 2**n_levels),
+                      "%.3f" % weight, weight_bar)
+
+                occupancy_weights[dat.sum_bits(configuration)] += weight
+
+        print("\n", end="")
+
+        for non_occupancy, weight in enumerate(occupancy_weights[::-1]):
+
+            if (weight > 1e-3):
+
+                weight_bar = "".join([colored("=", "green") if point < weight
+                                      else " "
+                                      for point
+                                      in np.linspace(0, 1 - 1e-10, 40)])
+
+                print("", n_levels - non_occupancy - 1, ":",
                       "%.3f" % weight, weight_bar)
 
         print("\nv_g/V =", "%.3f" % v.g, "; v_sd/V =", "%.3f" % v.sd)

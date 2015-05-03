@@ -89,7 +89,7 @@ def get_plottable_diff_conductance_in_v_space(iw_list, voltage_area):
 
 
 def mean_occupation(weights):
-    return sum(weight*sum_bits(index) for index, weight in enumerate(weights))
+    return sum(weight*sum_bits(config) for config, weight in weights)
 
 
 def get_mean_occupation_vs_v_sd(iw_list, v_g, voltage_area):

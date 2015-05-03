@@ -81,7 +81,6 @@ def get_plottable_diff_conductance_in_v_space(iw_list, voltage_area):
     # Informed by http://stackoverflow.com/questions/6323737/
     x, y = voltage_area
     # 0th element of ie_tuple is the current.
-    print("here")
     z = np.asarray([get_diff_conductance_vs_v_sd(iw_list, v_g, voltage_area)
                     for v_g in voltage_area[1]])
     nrows, ncols = len(y), len(x)

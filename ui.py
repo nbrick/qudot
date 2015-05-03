@@ -14,6 +14,7 @@ import data_handling as dat
 with open("output.csv", newline="") as csv_file:
     print("Processing CSV... (This might take a few seconds.)")
     lines = csv.reader(csv_file, delimiter=";", quoting=csv.QUOTE_NONNUMERIC)
+    n_levels = int(lines.__next__()[0])
     lines = sorted(sorted(lines, key=lambda x: x[1]), key=lambda x: x[0])
     v_sd_range = np.asarray(sorted(list(set([line[1] for line in lines]))))
     v_g_range = np.asarray(sorted(list(set([line[0] for line in lines]))))
@@ -21,7 +22,9 @@ with open("output.csv", newline="") as csv_file:
     iw_list = []
     for line in lines:
         current = line[2]
-        weights = line[3:]
+        weights = []
+        for index, configuration in enumerate(line[3::2]):
+            weights.append((int(configuration), line[2*index + 4]))
         iw_list.append((current, weights))
 
 
@@ -211,16 +214,15 @@ def ui(v_sd=0, v_g=0):
             voltage_area)
 
         for index, weight in sorted([(index, weight)
-                                     for index, weight in enumerate(weights)],
+                                     for index, weight in weights],
                                     key=lambda x: x[1], reverse=False):
 
-            if weight > 0.0001:
                 weight_bar = "".join([colored("=", "green") if point < weight
                                       else " "
                                       for point
                                       in np.linspace(0, 1 - 1e-10, 40)])
 
-                print(" " + pretty_bin(index, len(weights)),
+                print(" " + pretty_bin(index, 2**n_levels),
                       "%.3f" % weight, weight_bar)
 
         print("\nv_g/V =", "%.3f" % v.g, "; v_sd/V =", "%.3f" % v.sd)

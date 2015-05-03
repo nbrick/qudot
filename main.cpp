@@ -266,7 +266,7 @@ v_pair voltage_pair_from_index (int index) {
 int main () {
 
     std::ofstream outfile ("output.csv", std::ofstream::out);
-    // outfile << n_levels << "\n";  // Needed for visualization later.
+    outfile << n_levels << "\n";  // Needed for visualization later.
 
     /* 'Guess' that the dot is initially empty; w = { 1.0, 0.0, 0.0, ... }. */
     weights guess = { 1.0 };
@@ -378,16 +378,12 @@ int main () {
         }
         outfile << " ; " << current/e;
 
-        // for (cfg config = 0; config < n_configs; ++config) {
-        //     if (guess[config] > 1e-5)
-        //         outfile << " ; "<< config << " ; " << guess[config];
-        // }
-
         /* Write weights vector to file for later viewing. */
         for (cfg config = 0; config < n_configs; ++config) {
-            outfile << " ; " << guess[config];
+            if (guess[config] > 1e-3)
+                outfile << " ; "<< config << " ; " << guess[config];
         }
-
+        
         outfile << "\n";
     }
 }

@@ -213,8 +213,10 @@ def ui(v_sd=0, v_g=0):
             dat.get_index_from_voltage_pair(v.sd, v.g, voltage_area),
             voltage_area)
 
-        for index, weight in sorted([(index, weight)
-                                     for index, weight in weights],
+        occupancy_weights = np.zeros(n_levels)
+
+        for configuration, weight in sorted([(configuration, weight)
+                                     for configuration, weight in weights],
                                     key=lambda x: x[1], reverse=False):
 
                 weight_bar = "".join([colored("=", "green") if point < weight
@@ -222,7 +224,23 @@ def ui(v_sd=0, v_g=0):
                                       for point
                                       in np.linspace(0, 1 - 1e-10, 40)])
 
-                print(" " + pretty_bin(index, 2**n_levels),
+                print(" " + pretty_bin(configuration, 2**n_levels),
+                      "%.3f" % weight, weight_bar)
+
+                occupancy_weights[dat.sum_bits(configuration)] += weight
+
+        print("\n", end="")
+
+        for non_occupancy, weight in enumerate(occupancy_weights[::-1]):
+
+            if (weight > 1e-3):
+
+                weight_bar = "".join([colored("=", "green") if point < weight
+                                      else " "
+                                      for point
+                                      in np.linspace(0, 1 - 1e-10, 40)])
+
+                print("", n_levels - non_occupancy - 1, ":",
                       "%.3f" % weight, weight_bar)
 
         print("\nv_g/V =", "%.3f" % v.g, "; v_sd/V =", "%.3f" % v.sd)

@@ -13,12 +13,21 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 
 /* USER CONFIGURATION */
 
+// Note: If the simulation halts, try reducing the Runge-Kutta evolution step
+// size, listed below. A starting point is 1e-1 but for complex systems this
+// may need to be reduced as far as 1e-2, or perhaps further. Larger step size
+// means a faster simulation.
+
+/* Semiclassical simulation properties */
+constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double convergence_criterion = 1e-5;
+
 /* Temperature */
 constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.0*e, 0.01*e, 0.02*e, 0.03*e, 0.04*e, 0.05*e, 0.06*e, 0.07*e
+    0.0*e, 0.08*e, 0.16*e, 0.24*e, 0.32*e, 0.40*e, 0.48*e, 0.56*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */
@@ -31,10 +40,10 @@ constexpr double drain_widths[] {
 };
 
 /* Dot-system capacitances */
-constexpr double gate_capacitance =   1e-19;  // Farads
-constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  1e-18;  // Farads
-constexpr double extra_capacitance =  1e-19;  // Farads
+constexpr double gate_capacitance =   8e-19;  // Farads
+constexpr double source_capacitance = 8e-18;  // Farads
+constexpr double drain_capacitance =  8e-18;  // Farads
+constexpr double extra_capacitance =  8e-19;  // Farads
 
 /* Voltage-space to be explored */
 constexpr double v_g_min = 0.9;  // Volts
@@ -61,10 +70,6 @@ constexpr double drain_dos (double energy) {
     return 1;
 }
 constexpr double s_fermi_energy = 0.0*e;  // Joules
-
-/* Semiclassical simulation properties */
-constexpr double h = 1e-1;  // Runge-Kutta evolution step size
-constexpr double convergence_criterion = 1e-5;
 
 
 /* COMPILE-TIME CALCULATIONS */
@@ -102,11 +107,8 @@ typedef struct {
 } matrix_elem;
 
 typedef double mu_spectrum[n_levels];
-typedef mu_spectrum mu_container[n_configs];
 // TODO: typedef double mu_container[occupied][level][occ_num];
 // Should do this. Otherwise there are many redundant mu calculations.
-
-typedef double weights[n_configs];
 
 
 /* BINARY REPRESENTATION OF CONFIGURATIONS */
@@ -122,7 +124,7 @@ int sum_occupation (cfg config) {
     return sum;
 }
 
-int flipped_occupation (cfg config, int level) {
+cfg flipped_occupation (cfg config, int level) {
     return config ^ (1 << level);
 }
 
@@ -247,15 +249,15 @@ v_pair voltage_pair_from_index (int index) {
     if ((int)floor((double)index/(double)v_g_steps) % 2 == 0)
         voltage.gate = v_g_min
                        + ((index % v_g_steps)
-                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+                          *(v_g_max - v_g_min)/(double)v_g_steps);
     else
         voltage.gate = v_g_max
                        - (((index % v_g_steps) + 1)
-                          *(double)(v_g_max - v_g_min)/(double)v_g_steps);
+                          *(v_g_max - v_g_min)/(double)v_g_steps);
 
     voltage.sd = v_sd_min
                    + (floor((double)index/(double)v_g_steps)
-                      *(double)(v_sd_max - v_sd_min)/(double)(v_sd_steps));
+                      *(v_sd_max - v_sd_min)/(double)(v_sd_steps));
 
     return voltage;
 }
@@ -269,7 +271,8 @@ int main () {
     outfile << n_levels << "\n";  // Needed for visualization later.
 
     /* 'Guess' that the dot is initially empty; w = { 1.0, 0.0, 0.0, ... }. */
-    weights guess = { 1.0 };
+    std::vector<double> guess (n_configs);
+    guess[0] = 1;
 
     /* Iterate through points in voltage-space. */
     for (int voltage_index = 0;
@@ -283,7 +286,7 @@ int main () {
                   << "v_sd:" << voltage.sd;
 
         /* For each possible config, find all the chemical potentials. */
-        mu_container mu;
+        std::vector<mu_spectrum> mu (n_configs);
         for (cfg config = 0; config < n_configs; ++config) {
             for (int level = 0; level < n_levels; ++level) {
                 mu[config][level] = chemical_potential(

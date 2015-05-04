@@ -77,11 +77,11 @@ def get_diff_conductance_vs_v_g(iw_list, v_sd, voltage_area):
     return np.gradient(get_i_vs_v_g(iw_list, v_sd, voltage_area))
 
 
-def get_plottable_diff_conductance_in_v_space(iw_list, voltage_area):
+def get_plottable_current_in_v_space(iw_list, voltage_area):
     # Informed by http://stackoverflow.com/questions/6323737/
     x, y = voltage_area
     # 0th element of ie_tuple is the current.
-    z = np.asarray([get_diff_conductance_vs_v_sd(iw_list, v_g, voltage_area)
+    z = np.asarray([get_i_vs_v_sd(iw_list, v_g, voltage_area)
                     for v_g in voltage_area[1]])
     nrows, ncols = len(y), len(x)
     grid = z.reshape((nrows, ncols))

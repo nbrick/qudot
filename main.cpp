@@ -48,11 +48,11 @@ constexpr double extra_capacitance =  8e-19;  // Farads
 /* Voltage-space to be explored */
 constexpr double v_g_min = -0.5;  // Volts
 constexpr double v_g_max = 5.5;  // Volts
-constexpr int v_g_steps = 200;  // (y axis resolution)
+constexpr int v_g_steps = 400;  // (y axis resolution)
 
 constexpr double v_sd_min = -0.31;  // Volts
 constexpr double v_sd_max = 0.31;  // Volts
-constexpr int v_sd_steps = 200;  // (x axis resolution)
+constexpr int v_sd_steps = 400;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {

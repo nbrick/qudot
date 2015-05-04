@@ -91,11 +91,11 @@ def heatmap(axes=None):
         show = False
         heatmap_axes, colorbar_axes = axes
 
-    current_function, extent = dat.get_plottable_diff_conductance_in_v_space(
+    current_function, extent = dat.get_plottable_current_in_v_space(
         iw_list, voltage_area)
     heatmap_ = heatmap_axes.imshow(current_function, extent=extent,
                                    interpolation="nearest", aspect="auto",
-                                   cmap=cm.binary)
+                                   cmap=cm.rainbow)
 
     heatmap_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
     heatmap_axes.set_ylim([v_g_range[0], v_g_range[-1]])

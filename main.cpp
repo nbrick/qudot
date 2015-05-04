@@ -27,7 +27,7 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.00*e, 0.01*e, 0.02*e, 0.03*e, 0.04*e, 0.05*e, 0.06*e, 0.07*e
+    0.00*e, 0.00*e, 0.01*e, 0.01*e, 0.02*e, 0.02*e, 0.03*e, 0.03*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */

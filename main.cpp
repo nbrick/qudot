@@ -27,7 +27,7 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.00*e, 0.00*e, 0.01*e, 0.01*e, 0.02*e, 0.02*e, 0.03*e, 0.03*e
+    0.00*e, 0.00*e, 0.015*e, 0.015*e, 0.03*e, 0.03*e, 0.045*e, 0.045*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */
@@ -238,7 +238,7 @@ v_pair voltage_pair_from_index (int index) {
      *
      *        ┌┐┌┐┌┐┌┐┌finish
      *        │││││││││
-     *        │││││││││
+     *        │││││││││ <- FLIPPED!
      *   start┘└┘└┘└┘└┘
      *
      * where y: gate voltage; x: source-drain voltage. In this way, we ensure
@@ -246,18 +246,18 @@ v_pair voltage_pair_from_index (int index) {
      */
     v_pair voltage;
 
-    if ((int)floor((double)index/(double)v_g_steps) % 2 == 0)
-        voltage.gate = v_g_min
-                       + ((index % v_g_steps)
-                          *(v_g_max - v_g_min)/(double)v_g_steps);
+    if ((int)floor((double)index/(double)v_sd_steps) % 2 == 0)
+        voltage.sd = v_sd_min
+                       + ((index % v_sd_steps)
+                          *(v_sd_max - v_sd_min)/(double)v_sd_steps);
     else
-        voltage.gate = v_g_max
-                       - (((index % v_g_steps) + 1)
-                          *(v_g_max - v_g_min)/(double)v_g_steps);
+        voltage.sd = v_sd_max
+                       - (((index % v_sd_steps) + 1)
+                          *(v_sd_max - v_sd_min)/(double)v_sd_steps);
 
-    voltage.sd = v_sd_min
-                   + (floor((double)index/(double)v_g_steps)
-                      *(v_sd_max - v_sd_min)/(double)(v_sd_steps));
+    voltage.gate = v_g_min
+                   + (floor((double)index/(double)v_sd_steps)
+                      *(v_g_max - v_g_min)/(double)(v_g_steps));
 
     return voltage;
 }

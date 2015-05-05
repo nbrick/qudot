@@ -56,7 +56,7 @@ constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    if (energy > 0.1*e) {
+    if (energy > -0.2*e && energy < -0.01*e) {
         return 0;
     }
     return 1;
@@ -64,7 +64,7 @@ constexpr double source_dos (double energy) {
 constexpr double d_fermi_energy = 0.0*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy > 0.1*e) {
+    if (energy > -0.2*e && energy < -0.01*e) {
         return 0;
     }
     return 1;

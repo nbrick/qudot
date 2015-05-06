@@ -19,7 +19,7 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 // means a faster simulation.
 
 /* Semiclassical simulation properties */
-constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double h = 0.5e-1;  // Runge-Kutta evolution step size
 constexpr double convergence_criterion = 1e-5;
 
 /* Temperature */
@@ -46,26 +46,30 @@ constexpr double drain_capacitance =  1e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -0.3;  // Volts
-constexpr double v_g_max = 6.1;  // Volts
+constexpr double v_g_min = 0.4;  // Volts
+constexpr double v_g_max = 10.1;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = -0.21;  // Volts
-constexpr double v_sd_max = 0.21;  // Volts
+constexpr double v_sd_min = -0.11;  // Volts
+constexpr double v_sd_max = 0.11;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    if (energy > -0.2*e and energy < -0.18*e) {
+        return 5;
+    } else if (energy > -0.3*e and energy < -0.28*e) {
+        return 5;
     }
     return 1;
 }
 constexpr double d_fermi_energy = 0.0*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
+    if (energy > -0.2*e and energy < -0.18*e) {
+        return 5;
+    } else if (energy > -0.3*e and energy < -0.28*e) {
+        return 5;
     }
     return 1;
 }

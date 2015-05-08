@@ -44,9 +44,20 @@ def i_sd(v_g=0):
 
     axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
 
-    axes.set_title(r"at $V_\mathrm{g} = " + "%.2f" % v_g + "\ \mathrm{V}$")
-    axes.set_ylabel(r"$\sigma / \mathrm{arb.}$")
-    axes.set_xlabel(r"$V_\mathrm{sd} / \mathrm{V}$")
+    axes.set_title(r"at $V_\mathrm{g} = " + "%.2f" % v_g + "\ \mathrm{V}$",
+        size=25, y=1.04)
+    axes.set_ylabel(r"current $/\,\mathrm{arb.\,units}$", size=25)
+    axes.set_xlabel(r"$V_\mathrm{sd} / \mathrm{V}$", size=25)
+
+    for tick in axes.xaxis.get_major_ticks():
+                tick.label.set_fontsize(20)
+
+    for tick in axes.yaxis.get_major_ticks():
+                tick.label.set_fontsize(20)
+
+    axes.set_ylim([-7,7])
+
+    plot.subplots_adjust(bottom=0.15)
 
     plot.show(block=False)
 
@@ -186,8 +197,16 @@ def ui(v_sd=0, v_g=0):
     # Labels
     # ------
     def label_figures():
-        line_plot_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$")
-        line_plot_axes.set_ylabel(r"Current $I / \mathrm{arb.}$")
+        line_plot_axes.set_title(r"at $V_\mathrm{g} = " + "%.2f" % v_g + "\ \mathrm{V}$",
+            size=15, y=1.04)
+        line_plot_axes.set_ylabel(r"current $/\,\mathrm{arb.\,units}$", size=25)
+        line_plot_axes.set_xlabel(r"$V_\mathrm{sd} / \mathrm{V}$", size=25)
+
+        for tick in line_plot_axes.xaxis.get_major_ticks():
+                    tick.label.set_fontsize(20)
+
+        for tick in line_plot_axes.yaxis.get_major_ticks():
+                    tick.label.set_fontsize(20)
 
     # Slider update actions
     # ---------------------

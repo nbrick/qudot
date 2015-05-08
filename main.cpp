@@ -19,7 +19,7 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 // means a faster simulation.
 
 /* Semiclassical simulation properties */
-constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double h = 2e-1;  // Runge-Kutta evolution step size
 constexpr double convergence_criterion = 1e-5;
 
 /* Temperature */
@@ -27,16 +27,16 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.00*e, 0.020*e, 0.040*e, 0.060*e
+    0.00*e, 0.00*e, 0.020*e, 0.020*e, 0.40*e, 0.40*e//, 0.040*e, 0.040*e, 0.060*e, 0.060*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    1.0, 1.0, 1.0, 1.0
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0//, 1.0, 1.0, 1.0, 1.0
 };
 
 constexpr double drain_widths[] {
-    1.0, 1.0, 1.0, 1.0
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0//, 1.0, 1.0, 1.0, 1.0
 };
 
 /* Dot-system capacitances */
@@ -46,26 +46,26 @@ constexpr double drain_capacitance =  1e-18;  // Farads
 constexpr double extra_capacitance =  1e-18;  // Farads
 
 /* Voltage-space to be explored */
-constexpr double v_g_min = -6;  // Volts
-constexpr double v_g_max = 16;  // Volts
-constexpr int v_g_steps = 500;  // (y axis resolution)
+constexpr double v_g_min = -1;  // Volts
+constexpr double v_g_max = 10;  // Volts
+constexpr int v_g_steps = 200;  // (y axis resolution)
 
-constexpr double v_sd_min = -0.51;  // Volts
-constexpr double v_sd_max = 3;  // Volts
-constexpr int v_sd_steps = 500;  // (x axis resolution)
+constexpr double v_sd_min = -0.1;  // Volts
+constexpr double v_sd_max = 1.1;  // Volts
+constexpr int v_sd_steps = 200;  // (x axis resolution)
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double source_dos (double energy) {
-    if (energy > -1*e && energy < -0.01*e) {
-        return 0.01;
+    if (energy > -0.3*e && energy < -0.005*e) {
+        return 0.001;
     }
     return 1;
 }
 constexpr double d_fermi_energy = 0.0*e;  // Joules
 
 constexpr double drain_dos (double energy) {
-    if (energy > -1*e && energy < -0.01*e) {
-        return 0.01;
+    if (energy > -0.3*e && energy < -0.005*e) {
+        return 0.001;
     }
     return 1;
 }

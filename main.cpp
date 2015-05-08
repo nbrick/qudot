@@ -19,7 +19,7 @@ constexpr double k_B = 1.3806488e-23;  // Joules per Kelvin
 // means a faster simulation.
 
 /* Semiclassical simulation properties */
-constexpr double h = 1e-1;  // Runge-Kutta evolution step size
+constexpr double h = 0.5e-1;  // Runge-Kutta evolution step size
 constexpr double convergence_criterion = 1e-5;
 
 /* Temperature */
@@ -27,27 +27,27 @@ constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
 constexpr double single_electron_energies[] = {
-    0.00*e, 0.00*e, 0.01*e, 0.01*e, 0.02*e, 0.02*e, 0.03*e, 0.03*e
+    0.00*e, 0.00*e, 0.03*e, 0.03*e, 0.06*e, 0.06*e, 0.09*e, 0.09*e
 };  // Joules
 
 /* Tunnel widths (by dot level) */
 constexpr double source_widths[] {
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
 };
 
 constexpr double drain_widths[] {
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+    2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0
 };
 
 /* Dot-system capacitances */
 constexpr double gate_capacitance =   1e-19;  // Farads
-constexpr double source_capacitance = 1e-18;  // Farads
-constexpr double drain_capacitance =  1e-18;  // Farads
+constexpr double source_capacitance = 0.9e-18;  // Farads
+constexpr double drain_capacitance =  1.1e-18;  // Farads
 constexpr double extra_capacitance =  1e-19;  // Farads
 
 /* Voltage-space to be explored */
 constexpr double v_g_min = -0.3;  // Volts
-constexpr double v_g_max = 8.1;  // Volts
+constexpr double v_g_max = 9.1;  // Volts
 constexpr int v_g_steps = 200;  // (y axis resolution)
 
 constexpr double v_sd_min = -0.26;  // Volts

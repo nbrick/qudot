@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* gcc
+* GCC
 * Python 3
 * matplotlib
 * termcolor
@@ -12,6 +12,13 @@
 ```
 sudo apt-get install gcc python3 python3-matplotlib python3-termcolor
 ```
+
+### Installing elsewhere
+
+This project was developed on Linux but there's no reason it couldn't be run on
+Windows, following changes to some of the boilerplate. Please message me at
+`nebricks`(whirlpool-symbol)`gmail.com` if you need help, or make a pull request
+if you get a Windows version working.
 
 ## Usage
 

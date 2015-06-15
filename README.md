@@ -1,5 +1,18 @@
 # qudot
 
+This program simulates current flowing through a nanocrystal on the single-
+electron level, taking into account the capacitance of the nanocrystal and the
+single-particle energies of electrons in the nanocrystal. It is assumed that the
+nanocrystal has a discrete electron spectrum, i.e. that it constitutes a
+quantum dot.
+
+The core program (`main.cpp`) implements rate equations similar to those in
+[a paper of C. W. J. Beenakker](http://dx.doi.org/10.1103/PhysRevB.44.1646).
+A custom data visualisation tool (based on `matplotlib`) is also included.
+
+For more details, see
+[the project report](https://github.com/nbrick/qudot-doc/raw/master/report.pdf).
+
 ## Requirements
 
 * GCC

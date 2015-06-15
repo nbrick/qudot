@@ -18,12 +18,11 @@ For more details, see
 * GCC
 * Python 3
 * matplotlib
-* termcolor
 
 ### Installing the requirements on Debian-based Linuxes (including Ubuntu)
 
 ```
-sudo apt-get install gcc python3 python3-matplotlib python3-termcolor
+sudo apt-get install gcc python3 python3-matplotlib
 ```
 
 ### Installing elsewhere

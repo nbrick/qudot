@@ -1,7 +1,6 @@
 from math import ceil, log2
 import csv
 
-from termcolor import colored
 import numpy as np
 import matplotlib.pyplot as plot
 import matplotlib.gridspec as gridspec
@@ -123,8 +122,8 @@ def heatmap(axes=None):
 
 def pretty_bin(number, max_number):
     width = ceil(log2(max_number))
-    return "".join([colored("*", "white") if dat.bit(number, index)
-                    else colored("|", "red")
+    return "".join(["*" if dat.bit(number, index)
+                    else "|"
                     for index in range(width)])
 
 
@@ -219,7 +218,7 @@ def ui(v_sd=0, v_g=0):
                                      for configuration, weight in weights],
                                     key=lambda x: x[1], reverse=False):
 
-                weight_bar = "".join([colored("=", "green") if point < weight
+                weight_bar = "".join(["=" if point < weight
                                       else " "
                                       for point
                                       in np.linspace(0, 1 - 1e-10, 40)])
@@ -229,13 +228,13 @@ def ui(v_sd=0, v_g=0):
 
                 occupancy_weights[dat.sum_bits(configuration)] += weight
 
-        print("\n", end="")
+        print("\nabove: configuration weights; below: occupancy weights\n")
 
         for non_occupancy, weight in enumerate(occupancy_weights[::-1]):
 
             if (weight > 1e-3):
 
-                weight_bar = "".join([colored("=", "green") if point < weight
+                weight_bar = "".join(["=" if point < weight
                                       else " "
                                       for point
                                       in np.linspace(0, 1 - 1e-10, 40)])

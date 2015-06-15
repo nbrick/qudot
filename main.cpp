@@ -37,14 +37,14 @@ constexpr double single_electron_energies[] = {
 
 /* Electronic properties of leads (s: source; d: drain) */
 constexpr double d_fermi_energy = -5.1*e;  // Joules
-constexpr double source_dos (double energy) {
+double source_dos (double energy) {
     // Density of states can be an arbitrary function of energy.
     if (energy > 0.0) {}  // This suppresses an "unused variable" g++ warning.
     return 1;
 }
 
 constexpr double s_fermi_energy = -5.1*e;  // Joules
-constexpr double drain_dos (double energy) {
+double drain_dos (double energy) {
     if (energy > 0.0) {}
     return 1;
 }
@@ -294,7 +294,8 @@ int main () {
                   << "v_sd:" << voltage.sd;
 
         /* For each possible config, find all the chemical potentials. */
-        std::vector<mu_spectrum> mu (n_configs);
+        std::vector<mu_spectrum> mu;
+        mu.reserve(n_configs);
         for (cfg config = 0; config < n_configs; ++config) {
             for (int level = 0; level < n_levels; ++level) {
                 mu[config][level] = chemical_potential(

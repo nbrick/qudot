@@ -26,42 +26,45 @@ constexpr double convergence_criterion = 1e-5;
 constexpr double temp = 4.2;  // Kelvin
 
 /* Dot orbital energies */
-constexpr double dot_lumo = -5.1*e;  // Coulombs
+constexpr double dot_lumo = -5.1*e;  // Joules
 constexpr double single_electron_energies[] = {
     dot_lumo + 0.000*e, dot_lumo + 0.000*e,
-
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
     dot_lumo + 0.231*e, dot_lumo + 0.231*e,
-
     dot_lumo + 0.479*e, dot_lumo + 0.479*e,
 
 };  // Joules
 
-/* Tunnel widths (by dot level) */
+/* Electronic properties of leads (s: source; d: drain) */
+constexpr double d_fermi_energy = -5.1*e;  // Joules
+constexpr double source_dos (double energy) {
+    // Density of states can be an arbitrary function of energy.
+    if (energy > 0.0) {}  // This suppresses an "unused variable" g++ warning.
+    return 1;
+}
+
+constexpr double s_fermi_energy = -5.1*e;  // Joules
+constexpr double drain_dos (double energy) {
+    if (energy > 0.0) {}
+    return 1;
+}
+
+/* Tunnel widths (by dot level) in arbitrary units */
 constexpr double source_widths[] {
     3.0, 3.0,
-
     6.0, 6.0,
     6.0, 6.0,
-
     12.0, 12.0,
 };
 
 constexpr double drain_widths[] {
     0.5, 0.5,
-
     1.0, 1.0,
     1.0, 1.0,
-
     2.0, 2.0,
 };
 
 /* Dot-system capacitances */
-// Sun et al used CdSe nanocrystals with diameter 4.2 nm.
-// The leads were Au, whose dielectric constant is 6.9.
-// Gate capacitance is known small; Sun et al could not gate the dot.
-// Total capacitance is approximately 1.6e-18 Farads,
-// given by C = 4\pi\epsilon\epsilon_0 R.
 constexpr double gate_capacitance =   1e-20;  // Farads
 constexpr double source_capacitance = 1.6e-18;  // Farads
 constexpr double drain_capacitance =  1.6e-18;  // Farads
@@ -76,29 +79,7 @@ constexpr double v_sd_min = -1.1;  // Volts
 constexpr double v_sd_max = 1.1;  // Volts
 constexpr int v_sd_steps = 200;  // (x axis resolution)
 
-/* Electronic properties of leads (s: source; d: drain) */
-constexpr double source_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
-    }
-    return 1;
-    // if (energy/e > -4.8) {
-    //     return 0.0;
-    // } else if (energy/e > -5.3) {
-    //     return 0.0 + 1.0*(energy/e + 4.8)/(-5.3 + 4.8);
-    // } else {
-    //     return 1.0;
-    // }
-}
-constexpr double d_fermi_energy = -5.1*e;  // Joules
-
-constexpr double drain_dos (double energy) {
-    if (energy > 0.0) {
-        // Do nothing. (Suppress 'unused' warning.)
-    }
-    return 1;
-}
-constexpr double s_fermi_energy = -5.1*e;  // Joules
+/* (end of user configuration) */
 
 
 /* COMPILE-TIME CALCULATIONS */
@@ -136,8 +117,6 @@ typedef struct {
 } matrix_elem;
 
 typedef double mu_spectrum[n_levels];
-// TODO: typedef double mu_container[occupied][level][occ_num];
-// Should do this. Otherwise there are many redundant mu calculations.
 
 
 /* BINARY REPRESENTATION OF CONFIGURATIONS */
@@ -299,7 +278,7 @@ int main () {
     std::ofstream outfile ("output.csv", std::ofstream::out);
     outfile << n_levels << "\n";  // Needed for visualization later.
 
-    /* 'Guess' that the dot is initially empty; w = { 1.0, 0.0, 0.0, ... }. */
+    /* 'Guess' that the dot is initially empty; w = { 1, 0, 0, ... }. */
     std::vector<double> guess (n_configs);
     guess[0] = 1;
 
@@ -328,7 +307,6 @@ int main () {
         // Use a std::vector because we might decide later to make more matrix
         // elements non-zero, e.g. for radiative decay.
         std::vector<matrix_elem> matrix;
-        // TODO: Store just one row of the matrix in memory.
         for (cfg to = 0; to < n_configs; ++to) {
             // TODO: Only store matrix elements greater than some tolerance.
             // For "to" on the following line only, read "away".
@@ -340,7 +318,7 @@ int main () {
             }
         }
 
-        /* Iterate on dw/dt = M w until steady state is found. */
+        /* Iterate on dw/dt = Mw until steady state is found. */
         bool converged = false;
         int cycles = 0;
         while (!converged) {
@@ -397,6 +375,7 @@ int main () {
                 converged = converged && (increment < convergence_criterion);
             }
         }
+        // Print the number of Runge-Kutta iterations required for convergence.
         std::cout << " ; " << cycles << " cycles\n";
 
         /* Find weighted-average current and write it to file. */

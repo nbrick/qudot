@@ -88,7 +88,7 @@ def heatmap(axes=None):
         heatmap_axes = plot.subplot(gs[0])
     else:
         show = False
-        heatmap_axes, colorbar_axes = axes
+        heatmap_axes = axes
 
     current_function, extent = dat.get_plottable_diff_conductance_in_v_space(
         iw_list, voltage_area)
@@ -99,20 +99,13 @@ def heatmap(axes=None):
     heatmap_axes.set_xlim([v_sd_range[0], v_sd_range[-1]])
     heatmap_axes.set_ylim([v_g_range[0], v_g_range[-1]])
 
-    heatmap_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$", size=25)
-    heatmap_axes.set_ylabel(r"$V_\mathrm{g}/\mathrm{V}$", size=25)
+    heatmap_axes.set_xlabel(r"$V_\mathrm{sd}/\mathrm{V}$")
+    heatmap_axes.set_ylabel(r"$V_\mathrm{g}/\mathrm{V}$")
     heatmap_axes.set_title(
         r"$\frac{\partial I}{\partial V_\mathrm{sd}} /\mathrm{arb.\ units}$",
-        size=25, y=1.04)
-
+        y=1.04)
 
     heatmap_axes.locator_params(axis="x", nbins=5)
-
-    for tick in heatmap_axes.xaxis.get_major_ticks():
-                tick.label.set_fontsize(20)
-
-    for tick in heatmap_axes.yaxis.get_major_ticks():
-                tick.label.set_fontsize(20)
 
     plot.subplots_adjust(bottom=0.15)
 
@@ -132,13 +125,12 @@ def ui(v_sd=0, v_g=0):
 
     # Define the layout of the UI and add "plots" to UI regions.
     gs = gridspec.GridSpec(
-        6, 3,
-        height_ratios=[10, 2, 10, 2, 1, 1], width_ratios=[20, 1, 2])
+        6, 1,
+        height_ratios=[10, 2, 10, 2, 1, 1])
     heatmap_axes = plot.subplot(gs[0])
-    colorbar_axes = plot.subplot(gs[2])
-    line_plot_axes = plot.subplot(gs[6])
-    v_sd_slider_axes = plot.subplot(gs[12])
-    v_g_slider_axes = plot.subplot(gs[15])
+    line_plot_axes = plot.subplot(gs[2])
+    v_sd_slider_axes = plot.subplot(gs[4])
+    v_g_slider_axes = plot.subplot(gs[5])
 
     # Slider UI elements
     # ------------------
@@ -160,7 +152,7 @@ def ui(v_sd=0, v_g=0):
 
     # Conductance heat map
     # --------------------
-    heatmap(tuple([heatmap_axes, colorbar_axes]))
+    heatmap(heatmap_axes)
 
     # We will add a small cross marking the current position in v_g-v_sd space
     # to the heatmap plot. To keep track of its position, we use the following
@@ -228,7 +220,7 @@ def ui(v_sd=0, v_g=0):
 
                 occupancy_weights[dat.sum_bits(configuration)] += weight
 
-        print("\nabove: configuration weights; below: occupancy weights\n")
+        print("\nabove: configuration weights ; below: occupancy weights\n")
 
         for non_occupancy, weight in enumerate(occupancy_weights[::-1]):
 
@@ -268,4 +260,4 @@ def ui(v_sd=0, v_g=0):
     # Launch the matplotlib window.
     plot.show(block=False)
 
-print("Try ui(), or heatmap().")
+print("Try for instance ui(), heatmap(), i_sd(0.1) or diff_cond(0.1).")
